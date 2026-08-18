@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Wheel of Fate</title>
+
+<style>
+
+*{box-sizing:border-box}
+
+body{
+
+  margin:0;
+
+  font-family:Arial,sans-serif;
+
+  background:#10101a;
+
+  color:#fff;
+
+  text-align:center;
+
+}
+
+.container{max-width:900px;margin:auto;padding:20px}
+
+h1{font-size:38px;margin:10px 0}
+
+.subtitle{color:#bbb;margin-bottom:20px}
+
+button{
+
+  border:0;
+
+  border-radius:12px;
+
+  padding:14px 20px;
+
+  margin:6px;
+
+  font-size:16px;
+
+  font-weight:bold;
+
+  cursor:pointer;
+
+  background:#6c4cff;
+
+  color:white;
+
+}
+
+button:active{transform:scale(.97)}
+
+.card{
+
+  background:#1b1b2b;
+
+  border-radius:18px;
+
+  padding:20px;
+
+  margin:18px 0;
+
+  box-shadow:0 5px 20px #0008;
+
+}
+
+.character{
+
+  display:grid;
+
+  grid-template-columns:1fr 1fr;
+
+  gap:10px;
+
+  text-align:left;
+
+}
+
+.stat{
+
+  background:#27273b;
+
+  padding:12px;
+
+  border-radius:10px;
+
+}
+
+.label{color:#aaa;font-size:13px}
+
+.value{font-size:18px;font-weight:bold;margin-top:3px}
+
+.wheel{
+
+  width:220px;
+
+  height:220px;
+
+  border-radius:50%;
+
+  margin:20px auto;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  background:conic-gradient(
+
+    #ff4d6d 0 25%,
+
+    #ff9f43 25% 45%,
+
+    #ffd32a 45% 62%,
+
+    #20bf6b 62% 78%,
+
+    #45aaf2 78% 90%,
+
+    #8854d0 90% 100%
+
+  );
+
+  border:8px solid white;
+
+  box-shadow:0 0 30px #6c4cff88;
+
+  font-size:28px;
+
+  font-weight:bold;
+
+}
+
+.spinning{animation:spin .8s linear infinite}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.result{
+
+  font-size:20px;
+
+  margin:10px;
+
+  min-height:28px;
+
+}
+
+.winner{
+
+  font-size:28px;
+
+  font-weight:bold;
+
+  color:#ffd32a;
+
+}
+
+@media(max-width:600px){
+
+  h1{font-size:30px}
+
+  .character{grid-template-columns:1fr}
+
+  .wheel{width:190px;height:190px}
+
+  button{width:90%;margin:5px 0}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🎡 WHEEL OF FATE</h1>
+
+<div class="subtitle">Create two characters. Then let fate decide.</div>
+
+<div class="card">
+
+  <div id="wheel" class="wheel">FATE</div>
+
+  <div id="spinResult" class="result">Ready?</div>
+
+  <button onclick="generateCharacter(1)">🎡 Generate Character 1</button>
+
+  <button onclick="generateCharacter(2)">🎡 Generate Character 2</button>
+
+</div>
+
+<div class="card">
+
+  <h2>Character 1</h2>
+
+  <div id="character1" class="character">
+
+    <div class="stat">No character generated yet.</div>
+
+  </div>
+
+</div>
+
+<div class="card">
+
+  <h2>Character 2</h2>
+
+  <div id="character2" class="character">
+
+    <div class="stat">No character generated yet.</div>
+
+  </div>
+
+</div>
+
+<div class="card">
+
+  <button onclick="fight()">⚔️ FIGHT!</button>
+
+  <div id="fightResult" class="result">Generate both characters first.</div>
+
+</div>
+
+</div>
+
+<script>
+
+const races = [
+
+  {name:"Mortal",score:10,weight:35},
+
+  {name:"Enhanced Mortal",score:20,weight:25},
+
+  {name:"Mutant",score:35,weight:18},
+
+  {name:"Demon",score:50,weight:10},
+
+  {name:"Dragonborn",score:70,weight:6},
+
+  {name:"Celestial",score:90,weight:4},
+
+  {name:"Primordial",score:120,weight:2}
+
+];
+
+const strengths = [
+
+  {name:"Weak",score:10,weight:35},
+
+  {name:"Athletic",score:20,weight:25},
+
+  {name:"Powerful",score:35,weight:18},
+
+  {name:"Superhuman",score:55,weight:10},
+
+  {name:"Titanic",score:75,weight:6},
+
+  {name:"World-Shaking",score:100,weight:4},
+
+  {name:"Cosmic",score:140,weight:2}
+
+];
+
+const iq = [
+
+  {name:"Average",score:10,weight:35},
+
+  {name:"Smart",score:20,weight:25},
+
+  {name:"Genius",score:35,weight:18},
+
+  {name:"Mastermind",score:55,weight:10},
+
+  {name:"Supergenius",score:75,weight:6},
+
+  {name:"Omniscient-Level",score:100,weight:4},
+
+  {name:"Transcendent",score:140,weight:2}
+
+];
+
+const durability = [
+
+  {name:"Fragile",score:10,weight:35},
+
+  {name:"Tough",score:20,weight:25},
+
+  {name:"Hardened",score:35,weight:18},
+
+  {name:"Superhuman",score:55,weight:10},
+
+  {name:"Titan",score:75,weight:6},
+
+  {name:"Indestructible",score:100,weight:4},
+
+  {name:"Cosmic",score:140,weight:2}
+
+];
+
+const powers = [
+
+  {name:"None",score:0,weight:30},
+
+  {name:"Enhanced Senses",score:15,weight:25},
+
+  {name:"Element Control",score:30,weight:18},
+
+  {name:"Teleportation",score:45,weight:10},
+
+  {name:"Time Manipulation",score:65,weight:6},
+
+  {name:"Reality Manipulation",score:90,weight:4},
+
+  {name:"Fate Manipulation",score:130,weight:2}
+
+];
+
+const reserves = [
+
+  {name:"Tiny",score:5,weight:35},
+
+  {name:"Low",score:12,weight:25},
+
+  {name:"Moderate",score:25,weight:18},
+
+  {name:"High",score:40,weight:10},
+
+  {name:"Massive",score:60,weight:6},
+
+  {name:"Near-Infinite",score:85,weight:4},
+
+  {name:"Infinite",score:120,weight:2}
+
+];
+
+function weightedPick(list){
+
+  const total=list.reduce((sum,x)=>sum+x.weight,0);
+
+  let random=Math.random()*total;
+
+  for(const item of list){
+
+    random-=item.weight;
+
+    if(random<=0) return item;
+
+  }
+
+  return list[0];
+
+}
+
+function generateCharacter(number){
+
+  const wheel=document.getElementById("wheel");
+
+  const result=document.getElementById("spinResult");
+
+  wheel.classList.add("spinning");
+
+  result.textContent="THE WHEEL IS DECIDING...";
+
+  setTimeout(()=>{
+
+    wheel.classList.remove("spinning");
+
+    const character={
+
+      race:weightedPick(races),
+
+      strength:weightedPick(strengths),
+
+      iq:weightedPick(iq),
+
+      durability:weightedPick(durability),
+
+      power:weightedPick(powers),
+
+      reserves:weightedPick(reserves)
+
+    };
+
+    character.total =
+
+      character.race.score+
+
+      character.strength.score+
+
+      character.iq.score+
+
+      character.durability.score+
+
+      character.power.score+
+
+      character.reserves.score;
+
+    window["character"+number]=character;
+
+    displayCharacter(number,character);
+
+    result.textContent="FATE HAS SPOKEN.";
+
+  },900);
+
+}
+
+function displayCharacter(number,c){
+
+  document.getElementById("character"+number).innerHTML=`
+
+    <div class="stat">
+
+      <div class="label">RACE</div>
+
+      <div class="value">${c.race.name}</div>
+
+    </div>
+
+    <div class="stat">
+
+      <div class="label">STRENGTH</div>
+
+      <div class="value">${c.strength.name}</div>
+
+    </div>
+
+    <div class="stat">
+
+      <div class="label">IQ</div>
+
+      <div class="value">${c.iq.name}</div>
+
+    </div>
+
+    <div class="stat">
+
+      <div class="label">DURABILITY</div>
+
+      <div class="value">${c.durability.name}</div>
+
+    </div>
+
+    <div class="stat">
+
+      <div class="label">SPECIAL POWER</div>
+
+      <div class="value">${c.power.name}</div>
+
+    </div>
+
+    <div class="stat">
+
+      <div class="label">POWER RESERVES</div>
+
+      <div class="value">${c.reserves.name}</div>
+
+    </div>
+
+    <div class="stat">
+
+      <div class="label">FATE SCORE</div>
+
+      <div class="value">${c.total}</div>
+
+    </div>
+
+  `;
+
+}
+
+function fight(){
+
+  const a=window.character1;
+
+  const b=window.character2;
+
+  const output=document.getElementById("fightResult");
+
+  if(!a||!b){
+
+    output.textContent="Generate both characters first.";
+
+    return;
+
+  }
+
+  const aRoll=a.total*(0.85+Math.random()*0.3);
+
+  const bRoll=b.total*(0.85+Math.random()*0.3);
+
+  if(Math.abs(aRoll-bRoll)<8){
+
+    output.innerHTML="⚡ <b>DRAW!</b><br>The battle was unbelievably close.";
+
+  }else if(aRoll>bRoll){
+
+    output.innerHTML=`🏆 <span class="winner">CHARACTER 1 WINS!</span><br>
+
+    Fate Score: ${Math.round(aRoll)} vs ${Math.round(bRoll)}`;
+
+  }else{
+
+    output.innerHTML=`🏆 <span class="winner">CHARACTER 2 WINS!</span><br>
+
+    Fate Score: ${Math.round(bRoll)} vs ${Math.round(aRoll)}`;
+
+  }
+
+}
+
+</script>
+
+</body>
+
+</html>
