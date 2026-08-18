@@ -1,0 +1,1953 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Wheel of Fate</title>
+
+<style>
+
+*{box-sizing:border-box}
+
+body{
+
+  margin:0;
+
+  background:#070710;
+
+  color:#fff;
+
+  font-family:Arial,sans-serif;
+
+  text-align:center;
+
+}
+
+.app{
+
+  width:min(950px,100%);
+
+  margin:auto;
+
+  padding:16px;
+
+}
+
+h1{
+
+  font-size:38px;
+
+  margin:8px 0;
+
+}
+
+.subtitle{
+
+  color:#aaa;
+
+  margin-bottom:20px;
+
+}
+
+.card{
+
+  background:#151522;
+
+  border:1px solid #29293d;
+
+  border-radius:20px;
+
+  padding:18px;
+
+  margin:18px 0;
+
+}
+
+button{
+
+  background:#704cff;
+
+  color:#fff;
+
+  border:0;
+
+  border-radius:12px;
+
+  padding:14px 18px;
+
+  margin:6px;
+
+  font-size:16px;
+
+  font-weight:bold;
+
+  cursor:pointer;
+
+}
+
+button:disabled{
+
+  opacity:.45;
+
+}
+
+.secondary{
+
+  background:#29293d;
+
+}
+
+.pointer{
+
+  font-size:38px;
+
+  line-height:32px;
+
+  position:relative;
+
+  z-index:10;
+
+}
+
+.wheelWrap{
+
+  position:relative;
+
+  width:310px;
+
+  height:310px;
+
+  margin:12px auto;
+
+}
+
+.wheel{
+
+  position:relative;
+
+  width:290px;
+
+  height:290px;
+
+  margin:auto;
+
+  border-radius:50%;
+
+  border:7px solid white;
+
+  overflow:hidden;
+
+  box-shadow:0 0 35px #704cff77;
+
+  transition:transform 4.2s cubic-bezier(.12,.8,.16,1);
+
+}
+
+.emojiLayer{
+
+  position:absolute;
+
+  inset:0;
+
+  pointer-events:none;
+
+}
+
+.wheelEmoji{
+
+  position:absolute;
+
+  width:44px;
+
+  height:44px;
+
+  display:flex;
+
+  justify-content:center;
+
+  align-items:center;
+
+  transform:translate(-50%,-50%);
+
+  font-size:27px;
+
+  text-shadow:0 2px 4px #000;
+
+}
+
+.wheelCenter{
+
+  position:absolute;
+
+  z-index:5;
+
+  left:50%;
+
+  top:50%;
+
+  transform:translate(-50%,-50%);
+
+  width:68px;
+
+  height:68px;
+
+  border-radius:50%;
+
+  background:#10101b;
+
+  border:4px solid white;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  font-size:12px;
+
+  font-weight:bold;
+
+}
+
+.result{
+
+  min-height:62px;
+
+  margin:12px;
+
+  font-size:20px;
+
+  font-weight:bold;
+
+}
+
+.reveal{
+
+  color:#ffd43b;
+
+  font-size:28px;
+
+}
+
+.odds{
+
+  display:grid;
+
+  grid-template-columns:1fr 1fr;
+
+  gap:8px;
+
+  text-align:left;
+
+}
+
+.option{
+
+  background:#222235;
+
+  padding:10px;
+
+  border-radius:10px;
+
+}
+
+.option b{
+
+  display:block;
+
+}
+
+.option span{
+
+  color:#aaa;
+
+  font-size:13px;
+
+}
+
+.characterGrid{
+
+  display:grid;
+
+  grid-template-columns:1fr 1fr;
+
+  gap:8px;
+
+}
+
+.stat{
+
+  background:#222235;
+
+  padding:12px;
+
+  border-radius:10px;
+
+  text-align:left;
+
+}
+
+.stat small{
+
+  color:#999;
+
+}
+
+.stat strong{
+
+  display:block;
+
+  margin-top:4px;
+
+  font-size:17px;
+
+}
+
+.battleLog{
+
+  text-align:left;
+
+  background:#090910;
+
+  padding:15px;
+
+  border-radius:12px;
+
+  line-height:1.6;
+
+}
+
+.winner{
+
+  font-size:30px;
+
+  color:#ffd43b;
+
+}
+
+.history{
+
+  text-align:left;
+
+  background:#0b0b14;
+
+  border-radius:12px;
+
+  padding:12px;
+
+  margin-top:12px;
+
+  max-height:300px;
+
+  overflow:auto;
+
+}
+
+.historyItem{
+
+  padding:8px 0;
+
+  border-bottom:1px solid #242436;
+
+}
+
+.badge{
+
+  display:inline-block;
+
+  padding:5px 8px;
+
+  margin:3px;
+
+  border-radius:8px;
+
+  background:#29293d;
+
+  font-size:12px;
+
+}
+
+@media(max-width:600px){
+
+  h1{font-size:30px}
+
+  .wheelWrap{
+
+    width:285px;
+
+    height:285px;
+
+  }
+
+  .wheel{
+
+    width:270px;
+
+    height:270px;
+
+  }
+
+  .odds,
+
+  .characterGrid{
+
+    grid-template-columns:1fr;
+
+  }
+
+  button{
+
+    width:94%;
+
+  }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+<h1>🎡 WHEEL OF FATE</h1>
+
+<div class="subtitle">
+
+Create your character. Let fate decide. Then see who survives.
+
+</div>
+
+<div class="card">
+
+<h2 id="wheelTitle">Choose a character</h2>
+
+<div class="pointer">▼</div>
+
+<div class="wheelWrap">
+
+<div id="wheel" class="wheel">
+
+<div id="emojiLayer" class="emojiLayer"></div>
+
+<div class="wheelCenter">
+
+FATE
+
+</div>
+
+</div>
+
+</div>
+
+<div id="result" class="result">
+
+Ready.
+
+</div>
+
+<button id="generateA" onclick="startCharacter('A')">
+
+🎡 Generate Character A
+
+</button>
+
+<button id="generateB" onclick="startCharacter('B')">
+
+🎡 Generate Character B
+
+</button>
+
+<div id="odds"></div>
+
+</div>
+
+<div class="card">
+
+<h2>🅰️ Character A</h2>
+
+<div id="characterA" class="characterGrid">
+
+<div class="stat">Empty slot.</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>🅱️ Character B</h2>
+
+<div id="characterB" class="characterGrid">
+
+<div class="stat">Empty slot.</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>⚔️ FATE BATTLE</h2>
+
+<p>
+
+The characters fight using their actual abilities.
+
+</p>
+
+<button onclick="battle()">
+
+⚔️ LET THEM FIGHT
+
+</button>
+
+<div id="battleResult">
+
+Generate both characters first.
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+/* =========================================================
+
+   WHEEL DATA
+
+   Format:
+
+   [name, probability, powerValue, emoji]
+
+========================================================= */
+
+const wheels = {
+
+Race:[
+
+["Darwizzy",2,150,"👑"],
+
+["Human",12,10,"🧑"],
+
+["Angel",5,70,"👼"],
+
+["Animorph",5,45,"🐾"],
+
+["Cosmic Warrior",3,100,"🌌"],
+
+["Demi-god",4,85,"⚡"],
+
+["Demon",5,65,"😈"],
+
+["Devil",3,90,"👿"],
+
+["Dragon Slayer",4,60,"⚔️"],
+
+["Dryad",3,45,"🌳"],
+
+["Dwarf",4,30,"⛏️"],
+
+["Fey",4,50,"🧚"],
+
+["Elemental",4,60,"🔥"],
+
+["Elf",5,35,"🧝"],
+
+["Reincarnation",3,80,"♻️"],
+
+["Spirit",4,55,"👻"],
+
+["Giant",4,65,"🗿"],
+
+["Goblins",6,20,"👺"],
+
+["God",2,140,"☀️"],
+
+["Golem",4,55,"🗿"],
+
+["Hive Mind",3,70,"🐝"],
+
+["Mythical Beast",3,85,"🐲"],
+
+["Orc",5,35,"👹"],
+
+["Primordial",1,150,"🌑"],
+
+["Cyborg",4,55,"🤖"],
+
+["Merfolk",4,40,"🧜"],
+
+["Skeleton",5,25,"💀"],
+
+["Vampire",4,65,"🧛"],
+
+["Werebeasts",5,55,"🐺"]
+
+],
+
+Archetype:[
+
+["NPC",12,10,"👤"],
+
+["Slayer",4,55,"⚔️"],
+
+["Archeologist",4,30,"🏺"],
+
+["Martial Artist",5,55,"🥋"],
+
+["Tamer",4,45,"🐾"],
+
+["Alchemist",3,55,"⚗️"],
+
+["Rider",3,60,"🏇"],
+
+["Priest",3,65,"🙏"],
+
+["Goliath",3,70,"🗿"],
+
+["Pirate",4,45,"🏴‍☠️"],
+
+["Mage",4,70,"🧙"],
+
+["Cloaked",3,60,"🥷"],
+
+["Gladiator",4,55,"🛡️"],
+
+["Spirit Weaver",2,75,"👻"],
+
+["Mutant",3,65,"🧬"],
+
+["Resilient",4,55,"🛡️"],
+
+["Paladin",3,75,"✝️"],
+
+["Blessed",3,80,"✨"],
+
+["Cursed",3,75,"☠️"],
+
+["Equalizer",2,90,"⚖️"],
+
+["Royal",3,70,"👑"],
+
+["Apostle",2,85,"📜"],
+
+["Corrupted",3,65,"🩸"],
+
+["Primordial Champion",1,130,"🌌"],
+
+["Champion's Legacy",2,95,"🏆"],
+
+["Trickster",3,60,"🃏"],
+
+["Hybrid",4,65,"🔀"]
+
+],
+
+Strength:[
+
+["Weak",25,10,"🥀"],
+
+["Below Average",20,20,"👊"],
+
+["Average",18,35,"💪"],
+
+["Above Average",14,50,"🏋️"],
+
+["Superhuman",10,70,"🦾"],
+
+["Incalculable",7,100,"🌌"],
+
+["Boundless",2,150,"♾️"]
+
+],
+
+Speed:[
+
+["Slow",25,10,"🐢"],
+
+["Average",20,25,"🚶"],
+
+["Fast",18,40,"🏃"],
+
+["Light Speed",14,65,"💡"],
+
+["Infinite",10,95,"♾️"],
+
+["Immeasurable",8,120,"✨"]
+
+],
+
+Durability:[
+
+["Fragile",25,10,"🥚"],
+
+["Low",20,25,"🩹"],
+
+["Medium",18,40,"🛡️"],
+
+["High",14,60,"🧱"],
+
+["Mountain",10,80,"⛰️"],
+
+["Planetary",8,110,"🌎"],
+
+["Invulnerable",5,150,"♾️"]
+
+],
+
+IQ:[
+
+["Dumb",25,10,"🤪"],
+
+["Average",20,25,"🧠"],
+
+["Smart",18,40,"📚"],
+
+["Genius",14,60,"🎓"],
+
+["Super-genius",10,80,"🔬"],
+
+["Omniscient",5,130,"👁️"]
+
+],
+
+"Battle/Fighting":[
+
+["Untrained",25,10,"😵"],
+
+["Street Fighter",20,25,"👊"],
+
+["Trained",18,40,"🥊"],
+
+["Martial Artist",14,60,"🥋"],
+
+["Master",10,85,"⚔️"],
+
+["Godly",3,140,"👑"]
+
+],
+
+"Core Powers":[
+
+["Healing",5,35,"💚"],
+
+["Time Travel",2,100,"⏳"],
+
+["Teleportation",4,65,"🌀"],
+
+["Telekinesis",4,55,"🧠"],
+
+["Metamorphosis",4,50,"🦋"],
+
+["Invisibility",4,45,"👻"],
+
+["Cloning",4,55,"👥"],
+
+["Animal Control",4,40,"🐺"],
+
+["Superman",2,100,"🦸"],
+
+["Air Control",4,45,"🌪️"],
+
+["Water Control",4,45,"🌊"],
+
+["Flying",5,40,"🪽"],
+
+["True Aim",4,55,"🎯"],
+
+["Summoning",3,65,"🔮"],
+
+["Revival",2,100,"✨"],
+
+["Mind Reading",4,55,"🧠"],
+
+["Laser Vision",4,60,"👁️"],
+
+["Shapeshifting",4,55,"🔀"],
+
+["Power Absorption",3,80,"⚡"],
+
+["Intangibility",3,75,"👻"],
+
+["Astral Projection",4,60,"🌙"],
+
+["Force Field",4,55,"🔰"],
+
+["X-Ray Vision",4,35,"👁️"],
+
+["Possessing Others",2,85,"👤"],
+
+["Shadow Control",3,65,"🌑"],
+
+["Tough Skin",5,35,"🛡️"],
+
+["Necromancy",3,75,"💀"],
+
+["Elasticity",5,30,"🪢"],
+
+["Invulnerability",2,120,"♾️"],
+
+["Poison Fist",5,45,"☠️"],
+
+["Gravity Control",3,80,"🌌"],
+
+["Magnetic Manipulation",4,55,"🧲"],
+
+["Reality Warping",1,150,"🌀"],
+
+["Sonic Scream",5,45,"📢"],
+
+["Water Breathing",6,20,"🐠"],
+
+["Void Manipulation",2,110,"🌑"],
+
+["Vampirism",3,70,"🧛"],
+
+["Weather Control",3,65,"⛈️"],
+
+["Blood Control",3,70,"🩸"],
+
+["Molecular Manipulation",2,100,"⚛️"],
+
+["Toon Force",1,150,"🎨"],
+
+["Transmutation",2,90,"🔄"],
+
+["Rizz",5,25,"😎"],
+
+["Bone Control",4,55,"💀"]
+
+],
+
+"Modifiers & Chaos":[
+
+["New Backstory",20,20,"📖"],
+
+["Enchantment",18,45,"✨"],
+
+["Weakness",20,-25,"💔"],
+
+["Title Modifier",15,35,"🏷️"],
+
+["Chaos Factor",12,60,"🌀"],
+
+["Universe Swap",8,90,"🌌"],
+
+["Plot Armor",7,110,"🛡️"]
+
+],
+
+"Mage":[
+
+["Fire Magic",20,45,"🔥"],
+
+["Water Magic",18,40,"🌊"],
+
+["Earth Magic",16,45,"🪨"],
+
+["Wind Magic",15,45,"🌪️"],
+
+["Light Magic",12,60,"☀️"],
+
+["Dark Magic",12,70,"🌑"],
+
+["Lich Form",7,100,"💀"]
+
+],
+
+"Lich Powers":[
+
+["Regeneration",15,55,"💚"],
+
+["Reality Warping",5,120,"🌀"],
+
+["Void Manipulation",8,100,"🌑"],
+
+["Mind Control",10,75,"🧠"],
+
+["Darkness Manipulation",12,70,"🌑"],
+
+["Necromancy",15,80,"💀"],
+
+["Life Drain",12,70,"🩸"],
+
+["Time Alteration",8,90,"⏳"],
+
+["Curse Casting",10,65,"☠️"],
+
+["Power Negation",5,110,"🚫"]
+
+],
+
+"Potion":[
+
+["Healing Potion",20,35,"💚"],
+
+["Poison Potion",18,50,"☠️"],
+
+["Strength Potion",17,55,"💪"],
+
+["Speed Potion",17,55,"⚡"],
+
+["Explosion Potion",15,65,"💥"],
+
+["Invisibility Potion",13,60,"👻"]
+
+],
+
+"Mount":[
+
+["Horse",25,20,"🐎"],
+
+["Griffon",18,45,"🦅"],
+
+["Wyvern",15,60,"🐉"],
+
+["Dragon",12,90,"🐲"],
+
+["Cerberus",10,70,"🐕"],
+
+["Phoenix",10,100,"🔥"],
+
+["Cosmic Steed",10,130,"🌌"]
+
+],
+
+"God Favor":[
+
+["Zeus Favor",18,80,"⚡"],
+
+["Odin Favor",17,80,"🪶"],
+
+["Ra Favor",17,80,"☀️"],
+
+["Anubis Favor",16,80,"🐺"],
+
+["Poseidon Favor",16,80,"🌊"],
+
+["Hades Favor",16,85,"💀"]
+
+],
+
+"Pirate Crew":[
+
+["Swordsman",18,45,"⚔️"],
+
+["Sniper",16,50,"🎯"],
+
+["Cook",14,35,"🍳"],
+
+["Doctor",14,45,"🩺"],
+
+["Navigator",14,50,"🧭"],
+
+["Shipwright",12,45,"🔨"],
+
+["Emperor's Infamy",12,100,"👑"]
+
+],
+
+"Stealth Rank":[
+
+["Assassin",25,60,"🗡️"],
+
+["Thief",20,35,"💰"],
+
+["Shadow Ninja",20,70,"🥷"],
+
+["Phantom",18,80,"👻"],
+
+["Ghost",17,90,"🌫️"]
+
+],
+
+"Weaver":[
+
+["Soul Binding",25,65,"🔗"],
+
+["Puppet Master",25,60,"🪆"],
+
+["Totem Control",25,55,"🗿"],
+
+["Spirit Summon",25,70,"👻"]
+
+],
+
+"S6 Mutation":[
+
+["Acid Spit",20,45,"🧪"],
+
+["Extra Limbs",20,50,"🦾"],
+
+["Bone Spikes",20,55,"💀"],
+
+["Radioactive Aura",20,75,"☢️"],
+
+["Camouflage",20,40,"🫥"]
+
+],
+
+"Holy Powers":[
+
+["Divine Shield",30,70,"🛡️"],
+
+["Smite",25,75,"⚡"],
+
+["Holy Radiance",25,65,"✨"],
+
+["Angelic Blessing",20,80,"👼"]
+
+],
+
+"Cursed Powers":[
+
+["Decay",25,65,"☠️"],
+
+["Soul Drain",25,75,"🩸"],
+
+["Nightmare Manifestation",25,80,"😈"],
+
+["Blood Sacrificing",25,70,"🩸"]
+
+],
+
+"Royalty":[
+
+["Royal Guard",25,50,"🛡️"],
+
+["Conqueror's Haki",25,80,"👑"],
+
+["Unlimited Gold",25,55,"💰"],
+
+["Kingdom Summon",25,90,"🏰"]
+
+],
+
+"Belief":[
+
+["Zealot Fury",25,65,"🔥"],
+
+["Divine Intervention",25,100,"✨"],
+
+["Holy Crusade",25,75,"⚔️"],
+
+["Prophet Foresight",25,90,"🔮"]
+
+],
+
+"Primordials":[
+
+["Order",12,100,"⚖️"],
+
+["Death",12,110,"💀"],
+
+["Life",12,105,"🌱"],
+
+["Time",12,120,"⏳"],
+
+["Eternity",12,130,"♾️"],
+
+["Void",12,125,"🌑"],
+
+["Fate",14,140,"🎡"],
+
+["Destiny",14,140,"✨"]
+
+],
+
+"Champions":[
+
+["Blood of the Goat",25,85,"🐐"],
+
+["Ancient Weapon",25,80,"⚔️"],
+
+["Forgotten Style",25,75,"🥋"],
+
+["Legacy Armor",25,80,"🛡️"]
+
+],
+
+"Wheel of Tricks":[
+
+["Illusion Mirror",25,60,"🪞"],
+
+["Jester Bomb",25,65,"💣"],
+
+["Swap Places",25,70,"🔀"],
+
+["Fake Death",25,55,"💀"]
+
+],
+
+"Demi-God Origins":[
+
+["Champion's Blood (GOAT Parent)",34,90,"🐐"],
+
+["Divine Children (God Parent)",33,95,"⚡"],
+
+["Chosen (Both)",33,120,"🌌"]
+
+]
+
+};
+
+/* =========================================================
+
+   CHARACTER / CONDITIONAL DATA
+
+========================================================= */
+
+const baseOrder=[
+
+"Race",
+
+"Archetype",
+
+"Strength",
+
+"Speed",
+
+"Durability",
+
+"IQ",
+
+"Battle/Fighting",
+
+"Core Powers",
+
+"Modifiers & Chaos"
+
+];
+
+const conditional={
+
+"Mage":["Mage"],
+
+"Alchemist":["Potion"],
+
+"Rider":["Mount"],
+
+"Priest":["God Favor"],
+
+"Pirate":["Pirate Crew"],
+
+"Cloaked":["Stealth Rank"],
+
+"Spirit Weaver":["Weaver"],
+
+"Mutant":["S6 Mutation"],
+
+"Paladin":["Holy Powers"],
+
+"Blessed":["Holy Powers"],
+
+"Cursed":["Cursed Powers"],
+
+"Royal":["Royalty"],
+
+"Apostle":["Belief"],
+
+"Primordial Champion":["Primordials"],
+
+"Champion's Legacy":["Champions"],
+
+"Trickster":["Wheel of Tricks"],
+
+"Demi-god":["Demi-God Origins"]
+
+};
+
+/* =========================================================
+
+   STATE
+
+========================================================= */
+
+let characters={
+
+A:null,
+
+B:null
+
+};
+
+let spinning=false;
+
+/* =========================================================
+
+   WEIGHTED PICK
+
+========================================================= */
+
+function pick(list){
+
+  const total=list.reduce((sum,item)=>sum+item[1],0);
+
+  let r=Math.random()*total;
+
+  for(const item of list){
+
+    r-=item[1];
+
+    if(r<=0)return item;
+
+  }
+
+  return list[list.length-1];
+
+}
+
+/* =========================================================
+
+   DRAW CURRENT WHEEL
+
+========================================================= */
+
+function drawWheel(category){
+
+  const list=wheels[category];
+
+  const wheel=document.getElementById("wheel");
+
+  const emojiLayer=document.getElementById("emojiLayer");
+
+  let start=0;
+
+  let parts=[];
+
+  let emojis="";
+
+  const size=290;
+
+  const center=size/2;
+
+  const radius=105;
+
+  list.forEach((item,index)=>{
+
+    const degrees=(item[1]/100)*360;
+
+    const end=start+degrees;
+
+    parts.push(
+
+      `hsl(${index*37%360},75%,55%) ${start}deg ${end}deg`
+
+    );
+
+    const middle=(start+end)/2;
+
+    const rad=(middle-90)*Math.PI/180;
+
+    const left=center+Math.cos(rad)*radius;
+
+    const top=center+Math.sin(rad)*radius;
+
+    emojis+=`
+
+      <div
+
+        class="wheelEmoji"
+
+        style="left:${left}px;top:${top}px"
+
+      >${item[3]}</div>
+
+    `;
+
+    start=end;
+
+  });
+
+  wheel.style.background=
+
+    `conic-gradient(${parts.join(",")})`;
+
+  emojiLayer.innerHTML=emojis;
+
+}
+
+/* =========================================================
+
+   SHOW ODDS
+
+========================================================= */
+
+function showOdds(category){
+
+  const list=wheels[category];
+
+  let html=`
+
+    <h3>🎯 ${category} — Odds</h3>
+
+    <div class="odds">
+
+  `;
+
+  list.forEach(item=>{
+
+    html+=`
+
+      <div class="option">
+
+        <b>${item[3]} ${item[0]}</b>
+
+        <span>${item[1]}% chance</span>
+
+      </div>
+
+    `;
+
+  });
+
+  html+=`</div>`;
+
+  document.getElementById("odds").innerHTML=html;
+
+}
+
+/* =========================================================
+
+   DISPLAY CHARACTER
+
+========================================================= */
+
+function displayCharacter(slot){
+
+  const character=characters[slot];
+
+  if(!character)return;
+
+  let html="";
+
+  character.results.forEach(item=>{
+
+    html+=`
+
+      <div class="stat">
+
+        <small>${item.category}</small>
+
+        <strong>
+
+          ${item.choice[3]} ${item.choice[0]}
+
+        </strong>
+
+      </div>
+
+    `;
+
+  });
+
+  document.getElementById("character"+slot).innerHTML=html;
+
+}
+
+/* =========================================================
+
+   START CHARACTER
+
+========================================================= */
+
+function startCharacter(slot){
+
+  if(spinning)return;
+
+  characters[slot]={
+
+    slot:slot,
+
+    results:[],
+
+    conditionalQueue:[]
+
+  };
+
+  document.getElementById("character"+slot).innerHTML=
+
+    `<div class="stat">Generating...</div>`;
+
+  document.getElementById("battleResult").innerHTML=
+
+    "Generate both characters first.";
+
+  document.getElementById("generateA").disabled=true;
+
+  document.getElementById("generateB").disabled=true;
+
+  spinning=true;
+
+  runWheel(slot,0);
+
+}
+
+/* =========================================================
+
+   RUN WHEELS
+
+========================================================= */
+
+function runWheel(slot,index){
+
+  const character=characters[slot];
+
+  if(index>=baseOrder.length){
+
+    buildConditionalQueue(character);
+
+    runConditional(slot,0);
+
+    return;
+
+  }
+
+  const category=baseOrder[index];
+
+  spinCategory(
+
+    slot,
+
+    category,
+
+    ()=>runWheel(slot,index+1)
+
+  );
+
+}
+
+/* =========================================================
+
+   CONDITIONAL QUEUE
+
+========================================================= */
+
+function buildConditionalQueue(character){
+
+  const archetype=
+
+    character.results.find(
+
+      x=>x.category==="Archetype"
+
+    );
+
+  const race=
+
+    character.results.find(
+
+      x=>x.category==="Race"
+
+    );
+
+  if(archetype && conditional[archetype.choice[0]]){
+
+    conditional[archetype.choice[0]].forEach(x=>{
+
+      character.conditionalQueue.push(x);
+
+    });
+
+  }
+
+  if(race && conditional[race.choice[0]]){
+
+    conditional[race.choice[0]].forEach(x=>{
+
+      if(!character.conditionalQueue.includes(x)){
+
+        character.conditionalQueue.push(x);
+
+      }
+
+    });
+
+  }
+
+}
+
+/* =========================================================
+
+   CONDITIONAL WHEELS
+
+========================================================= */
+
+function runConditional(slot,index){
+
+  const character=characters[slot];
+
+  if(index>=character.conditionalQueue.length){
+
+    finishCharacter(slot);
+
+    return;
+
+  }
+
+  const category=character.conditionalQueue[index];
+
+  spinCategory(
+
+    slot,
+
+    category,
+
+    ()=>runConditional(slot,index+1)
+
+  );
+
+}
+
+/* =========================================================
+
+   ONE SPIN
+
+========================================================= */
+
+function spinCategory(slot,category,callback){
+
+  const character=characters[slot];
+
+  const chosen=pick(wheels[category]);
+
+  drawWheel(category);
+
+  showOdds(category);
+
+  document.getElementById("wheelTitle").textContent=
+
+    `Character ${slot} — ${category}`;
+
+  document.getElementById("result").innerHTML=
+
+    `🎡 THE WHEEL IS SPINNING...`;
+
+  const wheel=document.getElementById("wheel");
+
+  wheel.style.transition="none";
+
+  wheel.style.transform="rotate(0deg)";
+
+  void wheel.offsetWidth;
+
+  wheel.style.transition=
+
+    "transform 4.2s cubic-bezier(.12,.8,.16,1)";
+
+  const rotations=
+
+    2160+
+
+    Math.floor(Math.random()*1080);
+
+  wheel.style.transform=
+
+    `rotate(${rotations}deg)`;
+
+  setTimeout(()=>{
+
+    character.results.push({
+
+      category:category,
+
+      choice:chosen
+
+    });
+
+    displayCharacter(slot);
+
+    document.getElementById("result").innerHTML=`
+
+      <span class="reveal">
+
+        ${chosen[3]} ${chosen[0]}
+
+      </span>
+
+      <br>
+
+      ${chosen[1]}% chance
+
+    `;
+
+    setTimeout(callback,850);
+
+  },4300);
+
+}
+
+/* =========================================================
+
+   FINISH
+
+========================================================= */
+
+function finishCharacter(slot){
+
+  spinning=false;
+
+  document.getElementById("wheelTitle").textContent=
+
+    `Character ${slot} Complete`;
+
+  document.getElementById("result").innerHTML=
+
+    `<span class="reveal">🔥 FATE HAS SPOKEN.</span>`;
+
+  displayCharacter(slot);
+
+  document.getElementById("generateA").disabled=false;
+
+  document.getElementById("generateB").disabled=false;
+
+}
+
+/* =========================================================
+
+   GET VALUE
+
+========================================================= */
+
+function value(character,category){
+
+  const result=character.results.find(
+
+    x=>x.category===category
+
+  );
+
+  return result ? result.choice[2] : 0;
+
+}
+
+/* =========================================================
+
+   GET NAME
+
+========================================================= */
+
+function nameOf(character,category){
+
+  const result=character.results.find(
+
+    x=>x.category===category
+
+  );
+
+  return result ? result.choice[0] : "Unknown";
+
+}
+
+/* =========================================================
+
+   BATTLE
+
+========================================================= */
+
+function battle(){
+
+  const A=characters.A;
+
+  const B=characters.B;
+
+  const output=document.getElementById("battleResult");
+
+  if(
+
+    !A ||
+
+    !B ||
+
+    A.results.length===0 ||
+
+    B.results.length===0
+
+  ){
+
+    output.innerHTML=
+
+      `<p>Both characters must be generated first.</p>`;
+
+    return;
+
+  }
+
+  let a=0;
+
+  let b=0;
+
+  let log=[];
+
+  /* CORE STATS */
+
+  a+=value(A,"Strength");
+
+  b+=value(B,"Strength");
+
+  a+=value(A,"Speed")*1.25;
+
+  b+=value(B,"Speed")*1.25;
+
+  a+=value(A,"Durability");
+
+  b+=value(B,"Durability");
+
+  a+=value(A,"IQ")*.65;
+
+  b+=value(B,"IQ")*.65;
+
+  a+=value(A,"Battle/Fighting")*1.35;
+
+  b+=value(B,"Battle/Fighting")*1.35;
+
+  /* RACE / CLASS */
+
+  a+=value(A,"Race")*.7;
+
+  b+=value(B,"Race")*.7;
+
+  a+=value(A,"Archetype")*.7;
+
+  b+=value(B,"Archetype")*.7;
+
+  /* POWERS */
+
+  a+=value(A,"Core Powers")*1.35;
+
+  b+=value(B,"Core Powers")*1.35;
+
+  /* CONDITIONAL POWER */
+
+  A.results.forEach(x=>{
+
+    if(
+
+      !baseOrder.includes(x.category)
+
+    ){
+
+      a+=Math.max(0,x.choice[2])*.8;
+
+    }
+
+  });
+
+  B.results.forEach(x=>{
+
+    if(
+
+      !baseOrder.includes(x.category)
+
+    ){
+
+      b+=Math.max(0,x.choice[2])*.8;
+
+    }
+
+  });
+
+  /* CHAOS */
+
+  a+=value(A,"Modifiers & Chaos");
+
+  b+=value(B,"Modifiers & Chaos");
+
+  /* SMALL RANDOM ELEMENT */
+
+  a*=.9+Math.random()*.2;
+
+  b*=.9+Math.random()*.2;
+
+  log.push(
+
+    `⚔️ ${nameOf(A,"Race")} faces ${nameOf(B,"Race")}.`
+
+  );
+
+  if(value(A,"Speed")>value(B,"Speed")){
+
+    log.push(
+
+      `⚡ Character A strikes first with ${nameOf(A,"Speed")} speed.`
+
+    );
+
+  }else if(value(B,"Speed")>value(A,"Speed")){
+
+    log.push(
+
+      `⚡ Character B strikes first with ${nameOf(B,"Speed")} speed.`
+
+    );
+
+  }else{
+
+    log.push(
+
+      `⚡ Their speed is evenly matched.`
+
+    );
+
+  }
+
+  if(value(A,"Battle/Fighting")>
+
+     value(B,"Battle/Fighting")){
+
+    log.push(
+
+      `🥋 Character A has the superior combat technique.`
+
+    );
+
+  }else if(value(B,"Battle/Fighting")>
+
+          value(A,"Battle/Fighting")){
+
+    log.push(
+
+      `🥋 Character B has the superior combat technique.`
+
+    );
+
+  }
+
+  if(value(A,"Core Powers")>
+
+     value(B,"Core Powers")){
+
+    log.push(
+
+      `✨ Character A unleashes ${nameOf(A,"Core Powers")}.`
+
+    );
+
+  }else if(value(B,"Core Powers")>
+
+          value(A,"Core Powers")){
+
+    log.push(
+
+      `✨ Character B unleashes ${nameOf(B,"Core Powers")}.`
+
+    );
+
+  }else{
+
+    log.push(
+
+      `✨ Both fighters reveal equally dangerous powers.`
+
+    );
+
+  }
+
+  if(value(A,"Durability")>
+
+     value(B,"Durability")){
+
+    log.push(
+
+      `🛡️ Character A withstands the attack.`
+
+    );
+
+  }else if(value(B,"Durability")>
+
+          value(A,"Durability")){
+
+    log.push(
+
+      `🛡️ Character B withstands the attack.`
+
+    );
+
+  }
+
+  const difference=Math.abs(a-b);
+
+  let winner;
+
+  if(difference<12){
+
+    winner="DRAW";
+
+  }else{
+
+    winner=a>b?"A":"B";
+
+  }
+
+  if(winner==="DRAW"){
+
+    log.push(
+
+      `⚡ Neither fighter can gain a decisive advantage.`
+
+    );
+
+    output.innerHTML=`
+
+      <div class="winner">⚡ DRAW</div>
+
+      <div class="battleLog">
+
+        ${log.join("<br><br>")}
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+  log.push(
+
+    `🏆 Character ${winner} finds the decisive opening.`
+
+  );
+
+  output.innerHTML=`
+
+    <div class="winner">
+
+      🏆 CHARACTER ${winner} WINS
+
+    </div>
+
+    <div class="battleLog">
+
+      ${log.join("<br><br>")}
+
+    </div>
+
+  `;
+
+}
+
+/* =========================================================
+
+   INITIAL WHEEL
+
+========================================================= */
+
+drawWheel("Race");
+
+showOdds("Race");
+
+</script>
+
+</body>
+
+</html>
